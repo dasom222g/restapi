@@ -30,7 +30,7 @@ func FileUpload(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, filePath)
 }
 
-func NewHttpHandler() *http.ServeMux {
+func NewHttpHandler() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("public")))
 	mux.HandleFunc("/upload", FileUpload)

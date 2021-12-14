@@ -7,5 +7,7 @@ import (
 )
 
 func main() {
+	// http.Handle("/", http.FileServer(http.Dir("public")))
+	// http.HandleFunc("/upload", upload.FileUpload)
 	http.ListenAndServe(":3000", upload.NewHttpHandler())
 }
