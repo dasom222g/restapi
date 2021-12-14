@@ -14,4 +14,7 @@ Open a terminal and run the following Git command:
 _You should clone ```go-project\src\github.com```_
     
 ## Start working
-    go run main.go
+    $ go run main.go
+    
+## Start test
+    $ goconvey
