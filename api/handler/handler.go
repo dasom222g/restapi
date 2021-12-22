@@ -19,7 +19,8 @@ type user struct {
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
-	CreateAt  time.Time `json:"create_at"`
+	CreatedAt time.Time `json:"create_at"`
+	UpdatedAt time.Time `json:"update_at"`
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -35,10 +36,8 @@ func handleUsers(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(userMap)
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	for _, val := range userMap {
-		data, _ := json.Marshal(val)
-		fmt.Fprint(w, string(data), ",")
-	}
+	data, _ := json.Marshal(userMap)
+	fmt.Fprint(w, string(data))
 }
 
 func handleGetUser(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +69,8 @@ func handleCreatUser(w http.ResponseWriter, r *http.Request) {
 	currentId++
 	id := currentId
 	user.ID = id
-	user.CreateAt = time.Now()
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 	userMap[id] = user
 
 	w.Header().Add("Content-Type", "application/json")
@@ -79,6 +79,41 @@ func handleCreatUser(w http.ResponseWriter, r *http.Request) {
 	data, _ := json.Marshal(user)
 	fmt.Fprint(w, string(data))
 
+}
+
+func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	check.CheckError(err, w, http.StatusBadRequest)
+
+	targetUser, exists := userMap[id]
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "No user Id : %d", id)
+		return
+	}
+
+	// 요청 데이터 go 형식으로 변환
+	updateUser := new(user)
+	err = json.NewDecoder(r.Body).Decode(updateUser)
+	check.CheckError(err, w, http.StatusBadRequest)
+
+	// 요청한 데이터로 update
+	if updateUser.FirstName != "" {
+		targetUser.FirstName = updateUser.FirstName
+	}
+	if updateUser.LastName != "" {
+		targetUser.LastName = updateUser.LastName
+	}
+	if updateUser.Email != "" {
+		targetUser.Email = updateUser.Email
+	}
+	targetUser.UpdatedAt = time.Now()
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	data, _ := json.Marshal(targetUser)
+	fmt.Fprint(w, string(data))
 }
 
 func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +145,7 @@ func NewHttpHandler() http.Handler {
 	mux.HandleFunc("/users", handleUsers).Methods("GET")
 	mux.HandleFunc("/users", handleCreatUser).Methods("POST")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleGetUser).Methods("GET")
+	mux.HandleFunc("/users/{id:[0-9]+}", handleUpdateUser).Methods("PUT")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleDeleteUser).Methods("DELETE")
 	return mux
 }
