@@ -33,17 +33,23 @@ func handleUsers(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "No user")
 		return
 	}
-	fmt.Println(userMap)
+
+	users := []*user{}
+	for _, val := range userMap {
+		users = append(users, val)
+	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	data, _ := json.Marshal(userMap)
+	data, _ := json.Marshal(users)
 	fmt.Fprint(w, string(data))
 }
 
 func handleGetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
-	check.CheckError(err, w, http.StatusBadRequest)
+	if check.CheckError(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	// map에서 유효하지 않은 값을 요청하면 두번째 리턴값으로 boolean을 보냄
 	user, exists := userMap[id]
@@ -59,11 +65,13 @@ func handleGetUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, string(data))
 }
 
-func handleCreatUser(w http.ResponseWriter, r *http.Request) {
+func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	// user 생성
 	user := new(user)
 	err := json.NewDecoder(r.Body).Decode(user)
-	check.CheckError(err, w, http.StatusBadRequest)
+	if check.CheckError(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	// create user setting
 	currentId++
@@ -84,7 +92,9 @@ func handleCreatUser(w http.ResponseWriter, r *http.Request) {
 func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
-	check.CheckError(err, w, http.StatusBadRequest)
+	if check.CheckError(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	targetUser, exists := userMap[id]
 	if !exists {
@@ -96,7 +106,10 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	// 요청 데이터 go 형식으로 변환
 	updateUser := new(user)
 	err = json.NewDecoder(r.Body).Decode(updateUser)
-	check.CheckError(err, w, http.StatusBadRequest)
+	if check.CheckError(err, w, http.StatusBadRequest) {
+		return
+	}
+	fmt.Println(updateUser)
 
 	// 요청한 데이터로 update
 	if updateUser.FirstName != "" {
@@ -119,7 +132,9 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
-	check.CheckError(err, w, http.StatusBadRequest)
+	if check.CheckError(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	// 요청한 id의 데이터가 있는지 확인하여 없으면 No user , 있으면 Deleted
 	_, exists := userMap[id]
@@ -143,7 +158,7 @@ func NewHttpHandler() http.Handler {
 	// mux := http.NewServeMux()
 	mux.HandleFunc("/", handleIndex)
 	mux.HandleFunc("/users", handleUsers).Methods("GET")
-	mux.HandleFunc("/users", handleCreatUser).Methods("POST")
+	mux.HandleFunc("/users", handleCreateUser).Methods("POST")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleGetUser).Methods("GET")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleUpdateUser).Methods("PUT")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleDeleteUser).Methods("DELETE")

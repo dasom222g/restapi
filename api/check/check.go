@@ -2,14 +2,14 @@ package check
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 )
 
-func CheckError(err error, w http.ResponseWriter, code int) {
+func CheckError(err error, w http.ResponseWriter, code int) bool {
 	if err != nil {
 		w.WriteHeader(code)
 		fmt.Fprint(w, err)
-		log.Panic(err)
+		return true
 	}
+	return false
 }
