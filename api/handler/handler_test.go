@@ -31,11 +31,11 @@ func addUser(url string, assert *assert.Assertions, appendStr string) *user {
 	assert.Equal(http.StatusCreated, res.StatusCode)
 
 	// response 데이터 반환
-	createUser := new(user)
-	err = json.NewDecoder(res.Body).Decode(createUser)
+	createdUser := new(user)
+	err = json.NewDecoder(res.Body).Decode(createdUser)
 	assert.NoError(err)
 
-	return createUser
+	return createdUser
 }
 
 /* Test code*/
@@ -54,7 +54,7 @@ func TestHandleIndex(t *testing.T) {
 
 }
 
-func TestHandleUsers(t *testing.T) {
+func TestHandleGetUsersNotFound(t *testing.T) {
 	assert := assert.New(t)
 	ts := httptest.NewServer(NewHttpHandler())
 	defer ts.Close()
@@ -65,6 +65,28 @@ func TestHandleUsers(t *testing.T) {
 
 	data, _ := ioutil.ReadAll(res.Body)
 	assert.Contains(string(data), "No user")
+}
+
+func TestHandleGetUsers(t *testing.T) {
+	assert := assert.New(t)
+	ts := httptest.NewServer(NewHttpHandler())
+	defer ts.Close()
+
+	createdUser1 := addUser(ts.URL+"/users", assert, "11")
+	createdUser2 := addUser(ts.URL+"/users", assert, "22")
+
+	res, err := http.Get(ts.URL + "/users")
+	assert.NoError(err)
+	assert.Equal(http.StatusOK, res.StatusCode)
+
+	users := []*user{}
+	err = json.NewDecoder(res.Body).Decode(&users)
+	assert.NoError(err)
+	assert.NotZero(len(users))
+	assert.Equal(2, len(users))
+
+	assert.Equal(createdUser1.ID, users[0].ID)
+	assert.Equal(createdUser2.ID, users[1].ID)
 }
 
 func TestHandleGetUserNotFound(t *testing.T) {
@@ -86,9 +108,9 @@ func TestHandleCreatUser(t *testing.T) {
 	defer ts.Close()
 
 	// post 후 response 데이터와 gerUser 의 response 데이터 비교
-	createUser := addUser(ts.URL+"/users", assert, "11")
+	createdUser := addUser(ts.URL+"/users", assert, "11")
 
-	res, err := http.Get(ts.URL + "/users/" + strconv.Itoa(createUser.ID))
+	res, err := http.Get(ts.URL + "/users/" + strconv.Itoa(createdUser.ID))
 	assert.NoError(err)
 	assert.Equal(http.StatusOK, res.StatusCode)
 
@@ -97,8 +119,8 @@ func TestHandleCreatUser(t *testing.T) {
 	assert.NoError(err)
 
 	// 비교
-	assert.Equal(createUser.ID, getUser.ID)
-	assert.Equal(createUser.FirstName, getUser.FirstName)
+	assert.Equal(createdUser.ID, getUser.ID)
+	assert.Equal(createdUser.FirstName, getUser.FirstName)
 }
 
 func TestDeleteUserNotFound(t *testing.T) {

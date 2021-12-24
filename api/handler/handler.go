@@ -27,7 +27,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello, world!")
 }
 
-func handleUsers(w http.ResponseWriter, r *http.Request) {
+func handleGetUsers(w http.ResponseWriter, r *http.Request) {
 	if len(userMap) == 0 {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "No user")
@@ -157,7 +157,7 @@ func NewHttpHandler() http.Handler {
 	mux := mux.NewRouter()
 	// mux := http.NewServeMux()
 	mux.HandleFunc("/", handleIndex)
-	mux.HandleFunc("/users", handleUsers).Methods("GET")
+	mux.HandleFunc("/users", handleGetUsers).Methods("GET")
 	mux.HandleFunc("/users", handleCreateUser).Methods("POST")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleGetUser).Methods("GET")
 	mux.HandleFunc("/users/{id:[0-9]+}", handleUpdateUser).Methods("PUT")
