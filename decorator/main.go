@@ -78,7 +78,7 @@ func (self *DecryptComponent) Operation(data string) {
 }
 
 func main() {
-	// 순서: 암호화 -> 압축 -> 데이터 전송
+	// 순서: 암호화 -> 압축
 	sender := &EncrytComponent{
 		key: "abcd",
 		com: &ZipComponent{
@@ -88,7 +88,7 @@ func main() {
 	sender.Operation("Hello world!")
 	fmt.Println(sendData)
 
-	// 순서: 압축 풀기 -> 복호화 -> 데이터 전송
+	// 순서: 압축 풀기 -> 복호화
 	receiver := &UnZipComponent{
 		com: &DecryptComponent{
 			key: "abcd",
