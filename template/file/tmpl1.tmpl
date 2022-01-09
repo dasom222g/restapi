@@ -1,0 +1,8 @@
+Name: {{.Name}}
+Email: {{.Email}}
+{{if .IsOld -}}
+Age: {{.Age}} (old)
+{{else -}}
+Age: {{.Age}} (young)
+{{- end -}}
+
