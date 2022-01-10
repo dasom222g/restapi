@@ -25,7 +25,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	user := User{
 		Name:  "kelly",
 		Email: "kelly@gmail.com",
-		Age:   33,
+		Age:   25,
 	}
 
 	/*
@@ -40,9 +40,8 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func NewHttpHandler() http.Handler {
 	rd = render.New() // rd 정의
+
 	mux := pat.New()
-	// mux.HandleFunc("/", indexHandler).Methods("GET")
-	// mux.HandleFunc("/users", getUsersHandler).Methods("GET")
 	mux.Get("/users", getUsersHandler)
 	mux.Get("/", indexHandler)
 	return mux
