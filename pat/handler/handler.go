@@ -25,7 +25,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	user := User{
 		Name:  "kelly",
 		Email: "kelly@gmail.com",
-		Age:   25,
+		Age:   33,
 	}
 
 	/*
