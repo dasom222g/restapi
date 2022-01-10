@@ -1,12 +1,14 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/pat"
+	"github.com/unrolled/render"
 )
+
+var rd *render.Render
 
 type User struct {
 	Name  string `json:"name"`
@@ -25,22 +27,23 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Email: "kelly@gmail.com",
 		Age:   33,
 	}
-	data, err := json.Marshal(user)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, err)
-		return
-	}
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(data))
+
+	/*
+		data, _ := json.Marshal(user)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, string(data))
+	*/
+	// render로 윗 부분 소스 축약
+	rd.JSON(w, http.StatusOK, user)
 }
 
 func NewHttpHandler() http.Handler {
+	rd = render.New() // rd 정의
 	mux := pat.New()
 	// mux.HandleFunc("/", indexHandler).Methods("GET")
 	// mux.HandleFunc("/users", getUsersHandler).Methods("GET")
+	mux.Get("/users", getUsersHandler)
 	mux.Get("/", indexHandler)
-	mux.Get("users", getUsersHandler)
 	return mux
 }
