@@ -35,7 +35,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, string(data))
 	*/
-	// render로 윗 부분 소스 축약
+	// render로 소스 축약
 	rd.JSON(w, http.StatusOK, users)
 }
 
@@ -43,8 +43,10 @@ func addUsersHandler(w http.ResponseWriter, r *http.Request) {
 	user := new(User)
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
-		// w.WriteHeader(http.StatusBadRequest)
-		// fmt.Fprint(w, err)
+		/*
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, err)
+		*/
 		rd.Text(w, http.StatusBadRequest, err.Error())
 		return
 	}
