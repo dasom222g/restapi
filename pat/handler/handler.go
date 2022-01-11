@@ -79,8 +79,8 @@ func templateHandler(w http.ResponseWriter, r *http.Request) {
 
 func NewHttpHandler() http.Handler {
 	currentID = 0
-	users = make([]*User, 0)
-	// users = []*User{}
+	// users = make([]*User, 0)
+	users = []*User{}
 	rd = render.New() // rd 정의
 
 	mux := pat.New()
