@@ -39,7 +39,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	rd.JSON(w, http.StatusOK, users)
 }
 
-func addUsersHandler(w http.ResponseWriter, r *http.Request) {
+func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := new(User)
 	err := json.NewDecoder(r.Body).Decode(user)
 	if err != nil {
@@ -79,11 +79,13 @@ func templateHandler(w http.ResponseWriter, r *http.Request) {
 
 func NewHttpHandler() http.Handler {
 	currentID = 0
+	users = make([]*User, 0)
+	// users = []*User{}
 	rd = render.New() // rd 정의
 
 	mux := pat.New()
 	mux.Get("/users", getUsersHandler)
-	mux.Post("/users", addUsersHandler)
+	mux.Post("/users", addUserHandler)
 	mux.Get("/hello", templateHandler)
 	mux.Get("/", indexHandler)
 	return mux
