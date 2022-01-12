@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/pat"
 	"github.com/unrolled/render"
-	"github.com/urfave/negroni"
 )
 
 var rd *render.Render
@@ -86,13 +85,13 @@ func NewHttpHandler() http.Handler {
 
 	mux := pat.New()
 	// Negroni생성시 파일서버를 자동으로 지원하므로 public/index.html파일이 있으면 handler작성 하지않아도 자동으로 해당 파일을 인덱스 페이지로 구동시킴
-	n := negroni.Classic() // 새로운 Negroni 생성
+	// n := negroni.Classic() // 새로운 Negroni 생성
 	// 미들웨어 스택에 http.Handler 추가. 처리기는 Negroni에 추가된 순서로 호출
-	n.UseHandler(mux)
+	// n.UseHandler(mux)
 
 	mux.Get("/users", getUsersHandler)
 	mux.Post("/users", addUserHandler)
 	mux.Get("/hello", templateHandler)
-	// mux.Get("/", indexHandler)
-	return n
+	mux.Handle("/", http.FileServer(http.Dir("public")))
+	return mux
 }
