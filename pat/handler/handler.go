@@ -32,6 +32,7 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(data))
 	*/
 	// render로 소스 축약
+	fmt.Println("invoke!!")
 	rd.JSON(w, http.StatusOK, users)
 }
 
@@ -80,9 +81,8 @@ func NewHttpHandler() http.Handler {
 	rd = render.New() // rd 정의
 
 	mux := pat.New()
-	// Negroni생성시 파일서버를 자동으로 지원하므로 public/index.html파일이 있으면 handler작성 하지않아도 자동으로 해당 파일을 인덱스 페이지로 구동시킴
 	n := negroni.Classic() // 새로운 Negroni 생성
-	// 미들웨어 스택에 http.Handler 추가. 처리기는 Negroni에 추가된 순서로 호출
+	// 미들웨어 스택에 http.Handler 추가. 처리기는 Negroni에 추가된 순서로 호출 (hadler -> logger)
 	n.UseHandler(mux)
 
 	mux.Get("/users", getUsersHandler)
