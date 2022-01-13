@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
 	"time"
 
@@ -65,20 +64,27 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func templateHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.New("tmpl").ParseFiles("templates/hello.html")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, err)
-		return
-	}
-	tmpl.ExecuteTemplate(w, "hello.html", "dasomi")
+	/*
+		tmpl, err := template.New("tmpl").ParseFiles("templates/hello.html")
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, err)
+			return
+		}
+		tmpl.ExecuteTemplate(w, "hello.html", "dasomi")
+	*/
+	rd.HTML(w, http.StatusOK, "info", users)
 }
 
 func NewHttpHandler() http.Handler {
 	currentID = 0
 	// users = make([]*User, 0)
 	users = []*User{}
-	rd = render.New() // rd 정의
+	rd = render.New(render.Options{
+		Directory:  "template_contents",
+		Extensions: []string{".html", ".tmpl"},
+		Layout:     "hello",
+	}) // rd 정의
 
 	mux := pat.New()
 	n := negroni.Classic() // 새로운 Negroni 생성
