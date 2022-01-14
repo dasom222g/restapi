@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +30,6 @@ func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, string(data))
 	*/
 	// render로 소스 축약
-	fmt.Println("invoke!!")
 	rd.JSON(w, http.StatusOK, users)
 }
 
