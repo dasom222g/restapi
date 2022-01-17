@@ -1,3 +1,5 @@
+console.log(window.EventSource)
+
 const formArea = document.querySelector('#chat-form')
 const nameArea = formArea.querySelector('.chat-name')
 const logArea = formArea.querySelector('.chat-log')
