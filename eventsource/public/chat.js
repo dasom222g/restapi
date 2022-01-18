@@ -4,7 +4,7 @@ if (window.EventSource) {
   const logArea = formArea.querySelector('.chat-log')
   
   const messageArea = formArea.querySelector('#chat-msg')
-  const userName = prompt('What is your name?')
+  const username = prompt('What is your name?')
   
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -12,18 +12,21 @@ if (window.EventSource) {
     messageArea.value = ''
     messageArea.focus()
   
-    console.log('message', message, 'userName', userName)
+    console.log('message', message, 'username', username)
   }
   
   const es = new EventSource('/stream')
   es.onopen = async () => {
-    console.log('open!!')
     try {
-      const response = await fetch('/users', {
+      const data = { name: username }
+      console.log('username', username)
+      console.log('data', data)
+      const response = await fetch('/user', {
         method: 'POST',
-        body: { username }
+        body: JSON.stringify(data),
       })
-      console.log('response', response)
+      const result = await response.json()
+      console.log('result', result)
     } catch(error) {
       console.error(error)
     }
