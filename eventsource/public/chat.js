@@ -19,8 +19,6 @@ if (window.EventSource) {
   es.onopen = async () => {
     try {
       const data = { name: username }
-      console.log('username', username)
-      console.log('data', data)
       const response = await fetch('/user', {
         method: 'POST',
         body: JSON.stringify(data),
