@@ -7,6 +7,10 @@
   <title>Chatting</title>
 </head>
 <body>
+  <form action="/user" id ="user-form">
+    <input type="text" id="username" name="username">
+  </form>
+  <button type="submit" form="user-form">Send</button>
   <form action="/messges" id ="chat-form">
     <div class="chat-name" />
     <div class="chat-log" />
