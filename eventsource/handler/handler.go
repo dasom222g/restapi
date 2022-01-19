@@ -15,6 +15,7 @@ var rd *render.Render
 
 var currentID int
 var userMap map[int]*User
+var sendMessage chan SendMessageInfo
 
 type User struct {
 	ID        int       `json:"id"`
@@ -22,12 +23,16 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type SendMessageInfo struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	user := new(User)
 	err := json.NewDecoder(r.Body).Decode(&user)
-	// if check.CheckError(err, w, http.StatusBadRequest) {
-	// 	return
-	// }
 	if err != nil {
 		rd.Text(w, http.StatusBadRequest, err.Error())
 	}
@@ -36,12 +41,6 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	user.ID = currentID
 	user.CreatedAt = time.Now()
 	userMap[user.ID] = user
-
-	// w.Header().Add("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusCreated)
-
-	// data, _ := json.Marshal(&user)
-	// fmt.Fprint(w, string(data))
 	rd.JSON(w, http.StatusOK, &user)
 }
 
@@ -55,11 +54,6 @@ func handleGetUsers(w http.ResponseWriter, _ *http.Request) {
 	for _, value := range userMap {
 		users = append(users, value)
 	}
-	// w.Header().Add("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusOK)
-
-	// data, _ := json.Marshal(&users)
-	// fmt.Fprint(w, string(data))
 	rd.JSON(w, http.StatusOK, users)
 }
 
