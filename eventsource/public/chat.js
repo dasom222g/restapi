@@ -88,8 +88,7 @@ if (window.EventSource) {
   es.onmessage = (e) => {
     // const data = e.data
     const data = JSON.parse(e.data)
-    console.log('on!!', data, userInfo)
-    addMessage(data, data.message.includes('입장') ? 'userInfo' : 'message')
+    addMessage(data, data.message.includes('입장') || data.message.includes('퇴장') ? 'userInfo' : 'message')
   }
   
   window.onbeforeunload = async () => {
