@@ -34,7 +34,7 @@ type SendMessageInfo struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func handleCreateUser(w http.ResponseWriter, r *http.Request) {
+func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	user := new(User)
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -53,12 +53,11 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		Message:   fmt.Sprintf("%s 님이 입장하셨습니다.", user.Name),
 		CreatedAt: time.Now(),
 	}
-	log.Println("messageInfo", messageInfo)
-	setSendMessage(messageInfo)
 	rd.JSON(w, http.StatusOK, &user)
+	setSendMessage(messageInfo)
 }
 
-func handleGetUsers(w http.ResponseWriter, _ *http.Request) {
+func HandleGetUsers(w http.ResponseWriter, _ *http.Request) {
 	if len(userMap) == 0 {
 		rd.JSON(w, http.StatusOK, "No user")
 		return
@@ -71,7 +70,7 @@ func handleGetUsers(w http.ResponseWriter, _ *http.Request) {
 	rd.JSON(w, http.StatusOK, users)
 }
 
-func handlePostMessage(w http.ResponseWriter, r *http.Request) {
+func HandlePostMessage(w http.ResponseWriter, r *http.Request) {
 	messageInfo := new(SendMessageInfo)
 	err := json.NewDecoder(r.Body).Decode(&messageInfo)
 	if err != nil {
@@ -80,15 +79,11 @@ func handlePostMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	messageInfo.CreatedAt = time.Now()
-	setSendMessage(messageInfo)
 	rd.JSON(w, http.StatusOK, messageInfo)
+	setSendMessage(messageInfo)
 }
 
-func setSendMessage(messageInfo *SendMessageInfo) {
-	sendMessage <- *messageInfo
-}
-
-func handleLeaveUser(w http.ResponseWriter, r *http.Request) {
+func HandleLeaveUser(w http.ResponseWriter, r *http.Request) {
 	u := *r.URL
 	pathSlice := strings.Split(u.Path, "/")
 	id, err := strconv.Atoi(pathSlice[len(pathSlice)-1])
@@ -111,6 +106,10 @@ func handleLeaveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	setSendMessage(messageInfo)
 	rd.JSON(w, http.StatusOK, deleteUser)
+}
+
+func setSendMessage(messageInfo *SendMessageInfo) {
+	sendMessage <- *messageInfo
 }
 
 func processSendMessage(es eventsource.EventSource) {
@@ -138,10 +137,10 @@ func main() {
 
 	mux := pat.New()
 	mux.Handle("/stream", es) // es 오픈될때 매핑
-	mux.Post("/users", handleCreateUser)
-	mux.Get("/users", handleGetUsers)
-	mux.Post("/message", handlePostMessage)
-	mux.Delete("/users/{id}", handleLeaveUser)
+	mux.Post("/users", HandleCreateUser)
+	mux.Get("/users", HandleGetUsers)
+	mux.Post("/message", HandlePostMessage)
+	mux.Delete("/users/{id}", HandleLeaveUser)
 
 	n := negroni.Classic()
 	n.UseHandler(mux)

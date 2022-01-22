@@ -23,11 +23,11 @@ type user struct {
 	UpdatedAt time.Time `json:"update_at"`
 }
 
-func handleIndex(w http.ResponseWriter, r *http.Request) {
+func handleIndex(w http.ResponseWriter, _ *http.Request) {
 	fmt.Fprint(w, "Hello, world!")
 }
 
-func handleGetUsers(w http.ResponseWriter, r *http.Request) {
+func handleGetUsers(w http.ResponseWriter, _ *http.Request) {
 	if len(userMap) == 0 {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "No user")
