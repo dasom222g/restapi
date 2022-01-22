@@ -44,7 +44,7 @@ if (window.EventSource) {
     if (!value.length) return
     try {
       const data = { name: value }
-      const response = await fetch('/user', {
+      const response = await fetch('/users', {
         method: 'POST',
         body: JSON.stringify(data),
       })
@@ -88,10 +88,20 @@ if (window.EventSource) {
   es.onmessage = (e) => {
     // const data = e.data
     const data = JSON.parse(e.data)
-    console.log('on!!', data)
+    console.log('on!!', data, userInfo)
     addMessage(data, data.message.includes('입장') ? 'userInfo' : 'message')
   }
   
+  window.onbeforeunload = async () => {
+    if (!Object.keys(userInfo).length) return
+    const { id } = userInfo
+    try {
+      await fetch(`/users/${id}`, { method: 'DELETE' })
+    } catch (error) {
+      console.err(error)
+    }
+  }
+
   messageForm.addEventListener('submit', handleMessageSubmit)
   nameForm.addEventListener('submit', handleUserInfoSubmit)
 

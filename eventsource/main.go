@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/antage/eventsource"
@@ -87,6 +88,31 @@ func setSendMessage(messageInfo *SendMessageInfo) {
 	sendMessage <- *messageInfo
 }
 
+func handleLeaveUser(w http.ResponseWriter, r *http.Request) {
+	u := *r.URL
+	pathSlice := strings.Split(u.Path, "/")
+	id, err := strconv.Atoi(pathSlice[len(pathSlice)-1])
+	if err != nil {
+		rd.Text(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	deleteUser, exists := userMap[id]
+	if !exists {
+		rd.Text(w, http.StatusOK, fmt.Sprintf("No exists user. ID : %s", strconv.Itoa(id)))
+		return
+	}
+	delete(userMap, id)
+	// 퇴장 메시지
+	messageInfo := &SendMessageInfo{
+		ID:        deleteUser.ID,
+		Name:      deleteUser.Name,
+		Message:   fmt.Sprintf("%s 님이 퇴장하셨습니다.", deleteUser.Name),
+		CreatedAt: time.Now(),
+	}
+	setSendMessage(messageInfo)
+	rd.JSON(w, http.StatusOK, deleteUser)
+}
+
 func processSendMessage(es eventsource.EventSource) {
 	log.Println("len!!!", len(sendMessage))
 	for messageInfo := range sendMessage {
@@ -112,9 +138,10 @@ func main() {
 
 	mux := pat.New()
 	mux.Handle("/stream", es) // es 오픈될때 매핑
-	mux.Post("/user", handleCreateUser)
+	mux.Post("/users", handleCreateUser)
 	mux.Get("/users", handleGetUsers)
 	mux.Post("/message", handlePostMessage)
+	mux.Delete("/users/{id}", handleLeaveUser)
 
 	n := negroni.Classic()
 	n.UseHandler(mux)
